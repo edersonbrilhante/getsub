@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 import sys
 import os
 import hashlib
 import urllib
 import urllib2
+import codecs
 
 EXTENSOES = ['avi', 'mkv', 'mp4']
 
@@ -21,7 +23,7 @@ def cataLegenda(filme):
 	if filme[-3:] not in EXTENSOES:
 		return "extensao desconhecida"
 	
-	if os.path.isfile(filme[:-4]+".srt"):
+	if os.path.isfile(filme[:-4]+".srt") or os.path.isfile(filme[:-4]+".pt.srt"):
 		return "arquivo de legenda ja existe"
 	
 	data = urllib.urlencode({"action": "download", 
@@ -39,9 +41,11 @@ def cataLegenda(filme):
 	subs = resp.read()
 	
 	if subs:
-		srtname = filme[:-4]+'.srt'
-		srt = open(srtname, 'w')
-		srt.write(subs)
+		srtname = filme[:-4]+'.pt.srt'
+		srt = codecs.open(srtname, 'w', 'utf8')
+		srt.write(u'\ufeff')
+		srt.write(subs.decode('utf8','ignore'))
+		srt.close()
 	else:
 		return "legenda nao encontrada"
 	
